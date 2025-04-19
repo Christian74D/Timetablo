@@ -1,6 +1,9 @@
 import pandas as pd
+import os
 
-df = pd.read_excel('sastra_data.xlsx')
+base = os.path.dirname(os.path.abspath(__file__))
+
+df = pd.read_excel(os.path.join(base, 'sastra_data.xlsx'))
 
 subject_codes = []
 for _, row in df.iterrows():
@@ -8,7 +11,7 @@ for _, row in df.iterrows():
 sorted_subject_codes = sorted(set(subject_codes))
 generated_subject_codes = [f"SUB_{str(i).zfill(3)}" for i in range(len(sorted_subject_codes))]
 subject_df = pd.DataFrame({'subject_code': sorted_subject_codes, 'generated_code': generated_subject_codes})
-subject_df.to_excel('sorted_subject_codes.xlsx', index=False)
+subject_df.to_excel(os.path.join(base, 'sorted_subject_codes.xlsx'), index=False)
 
 staff_names = []
 for _, row in df.iterrows():
@@ -16,7 +19,7 @@ for _, row in df.iterrows():
 sorted_staff_names = sorted(set(staff_names))
 generated_staff_codes = [f"FAC_{str(i).zfill(3)}" for i in range(len(sorted_staff_names))]
 staff_df = pd.DataFrame({'staff_name': sorted_staff_names, 'generated_code': generated_staff_codes})
-staff_df.to_excel('sorted_staff_codes.xlsx', index=False)
+staff_df.to_excel(os.path.join(base, 'sorted_staff_codes.xlsx'), index=False)
 
 sections = []
 for _, row in df.iterrows():
@@ -24,7 +27,7 @@ for _, row in df.iterrows():
 sorted_sections = sorted(set(sections))
 generated_section_codes = [f"SEC_{str(i).zfill(3)}" for i in range(len(sorted_sections))]
 section_df = pd.DataFrame({'section': sorted_sections, 'generated_code': generated_section_codes})
-section_df.to_excel('sorted_section_codes.xlsx', index=False)
+section_df.to_excel(os.path.join(base, 'sorted_section_codes.xlsx'), index=False)
 
 section_map = section_df.set_index('section')['generated_code'].to_dict()
 subject_map = subject_df.set_index('subject_code')['generated_code'].to_dict()
@@ -42,6 +45,6 @@ for _, row in df.iterrows():
     encoded_rows.append(encoded_row)
 
 encoded_df = pd.DataFrame(encoded_rows)
-encoded_df.to_excel('sastra_data_encoded.xlsx', index=False)
+encoded_df.to_excel(os.path.join(base, 'sastra_data_encoded.xlsx'), index=False)
 
-print("Data encoded and saved to 'sastra_data_encoded.xlsx'")
+print("Data encoded and saved.")
