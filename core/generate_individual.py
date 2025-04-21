@@ -13,16 +13,10 @@ def generate_gene():
         for sec in section_data["section"]
     }
 
-    # Loop through the data items (subjects or classes)
     for item in data:
-        assigned = False
-        attempts = 0
-
-        if item["block"] is not None:  # If block is not None, assign directly
-            clashes = False
+        if item["block"] is not None:  
             for period in item["block"]:
                 day, hour = period
-                # Adjust for 1-based indexing (subtract 1)
                 day -= 1
                 hour -= 1
                 # Check if the slot is available for all sections
@@ -31,27 +25,25 @@ def generate_gene():
                         gene[sec][day][hour] = (item["id"], item["subjects"])
                         free_slots[sec].remove((day, hour))
                 else:
-                    clashes = True
                     print(f"Clash detected for item {item['id']} at period {period}.")
-                    break  # Stop if any clash occurs
+                    break  
 
-            if not clashes:
-                item["period"] = item["block"]
-                assigned = True
+            item["period"] = item["block"]
+
         else:
-            # Random allocation if block is None
-            while not assigned and attempts < 100:
-                day = random.randint(0, DAYS - 1)
-                hour = random.randint(0, HOURS - 1)
-                if all((day, hour) in free_slots[sec] for sec in item["sections"]):
-                    for sec in item["sections"]:
-                        gene[sec][day][hour] = (item["id"], item["subjects"])
-                        free_slots[sec].remove((day, hour))
-                    item["period"] = (day, hour)
-                    assigned = True
-                attempts += 1
-
-            if not assigned:
-                print("Assignment failed:", item)
-
+            theory, lab = item["theory"], item["lab"] 
+            # Theory
+            for _ in range(theory):
+                for _ in range(100):
+                    day = random.randint(0, DAYS - 1)
+                    hour = random.randint(0, HOURS - 1)
+                    if all((day, hour) in free_slots[sec] for sec in item["sections"]):
+                        for sec in item["sections"]:
+                            gene[sec][day][hour] = (item["id"], item["subjects"])
+                            free_slots[sec].remove((day, hour))
+                        item["period"] = (day, hour)
+                        break
+                else:
+                    print("Assignment failed:", item, f"\nremaining assignments: theory {theory} lab {lab}")
+                
     return gene

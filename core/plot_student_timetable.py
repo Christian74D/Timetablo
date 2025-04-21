@@ -3,8 +3,9 @@ from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, KeepTogether, PageBreak
 from generate_individual import generate_gene
-from constants import DAYS, HOURS, section_data, data
+from constants import DAYS, HOURS, section_data, data, data_lookup, blocked_color, multisec_color
 from tqdm import tqdm
+
 
 def create_section_tables(gene, section_name, styles, normal_style):
     elements = []
@@ -14,24 +15,21 @@ def create_section_tables(gene, section_name, styles, normal_style):
     header_row = [""] + [f"Period {i+1}" for i in range(HOURS)]
     table_data.append(header_row)
 
-    green_cells = []
-    yellow_cells = []
-
-    for item in data:
-        if item["block"] is not None and section_name in item["sections"]:
-            for day, hour in item["block"]:
-                green_cells.append((day - 1, hour - 1))
+    blocked_cells = []
+    multisec_cells = []
 
     for day in range(DAYS):
         row = [f"Day {day+1}"]
         for hour in range(HOURS):
             entry = timetable[day][hour]
             if entry:
-                subject_code = entry[1][0] if isinstance(entry[1], list) else entry[1]
+                subject_code = ",\n".join(entry[1]) if isinstance(entry[1], list) else entry[1]
                 text = f"{subject_code} ({entry[0]})"
                 cell_content = Paragraph(text, normal_style)
-                if isinstance(entry[0], list) and len(entry[0]) > 1:
-                    yellow_cells.append((day, hour))
+                if data_lookup[entry[0]]["block"]:
+                    blocked_cells.append((day, hour))
+                elif len(data_lookup[entry[0]]["sections"]) > 1:
+                    multisec_cells.append((day, hour))
             else:
                 cell_content = ""
             row.append(cell_content)
@@ -52,11 +50,11 @@ def create_section_tables(gene, section_name, styles, normal_style):
         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
     ]
 
-    for day, hour in green_cells:
-        timetable_style.append(('BACKGROUND', (hour+1, day+1), (hour+1, day+1), colors.lightgreen))
+    for day, hour in blocked_cells:
+        timetable_style.append(('BACKGROUND', (hour+1, day+1), (hour+1, day+1), blocked_color))
 
-    for day, hour in yellow_cells:
-        timetable_style.append(('BACKGROUND', (hour+1, day+1), (hour+1, day+1), colors.yellow))
+    for day, hour in multisec_cells:
+        timetable_style.append(('BACKGROUND', (hour+1, day+1), (hour+1, day+1), multisec_color))
 
     timetable_table.setStyle(TableStyle(timetable_style))
 

@@ -21,10 +21,19 @@ generated_staff_codes = [f"FAC_{str(i).zfill(3)}" for i in range(len(sorted_staf
 staff_df = pd.DataFrame({'staff_name': sorted_staff_names, 'generated_code': generated_staff_codes})
 staff_df.to_excel(os.path.join(base, 'sorted_staff_codes.xlsx'), index=False)
 
+def section_sort_key(section):
+    parts = section.split('_')
+    try:
+        sem = int(parts[0])
+        sec = parts[-1]
+    except (IndexError, ValueError):
+        sem, sec = 0, ''
+    return (sem, sec)
+
 sections = []
 for _, row in df.iterrows():
     sections.extend([s.strip() for s in str(row['sections']).split(',')])
-sorted_sections = sorted(set(sections))
+sorted_sections = sorted(set(sections), key=section_sort_key)
 generated_section_codes = [f"SEC_{str(i).zfill(3)}" for i in range(len(sorted_sections))]
 section_df = pd.DataFrame({'section': sorted_sections, 'generated_code': generated_section_codes})
 section_df.to_excel(os.path.join(base, 'sorted_section_codes.xlsx'), index=False)
