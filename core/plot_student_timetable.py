@@ -2,12 +2,12 @@ from reportlab.lib.pagesizes import letter, landscape
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, KeepTogether, PageBreak
-from generate_individual import generate_gene
-from constants import DAYS, HOURS, section_data, data, data_lookup, blocked_color, multisec_color
+from core.generate_individual import generate_gene
+from core.constants import DAYS, HOURS, blocked_color, multisec_color
 from tqdm import tqdm
 
 
-def create_section_tables(gene, section_name, styles, normal_style):
+def create_section_tables(gene, section_name, styles, normal_style, data, data_lookup):
     elements = []
 
     timetable = gene[section_name]
@@ -62,7 +62,7 @@ def create_section_tables(gene, section_name, styles, normal_style):
     staff_table_data.append(["ID", "Subject Codes", "Staff Names", "Theory", "Lab"])
 
     for item in data:
-        if section_name in item["sections"] and item["block"] is None:
+        if section_name in item["sections"] and item["theory"] + item["lab"] > 0:
             subject_codes = ", ".join(item["subjects"]) if item["subjects"] else "N/A"
             staff_names_str = ", ".join(item["staffs"]) if item["staffs"] else "N/A"
             theory_str = str(item["theory"]) if item["theory"] is not None else "N/A"
@@ -93,8 +93,7 @@ def create_section_tables(gene, section_name, styles, normal_style):
 
     return elements
 
-def plot_timetables_for_all_sections():
-    gene = generate_gene()
+def plot_timetables_for_all_sections(gene, section_data, data, data_lookup,):
     filename = "timetables_all_sections.pdf"
     document = SimpleDocTemplate(filename, pagesize=landscape(letter), rightMargin=20, leftMargin=20, topMargin=20, bottomMargin=20, title="Timetablo")
     
@@ -108,8 +107,8 @@ def plot_timetables_for_all_sections():
     )
 
     all_elements = []
-    for section_name in tqdm(section_data["section"], desc="Generating timetables"):
-        section_elements = create_section_tables(gene, section_name, styles, normal_style)
+    for section_name in tqdm(section_data, desc="Generating timetables"):
+        section_elements = create_section_tables(gene, section_name, styles, normal_style, data, data_lookup)
         all_elements.extend(section_elements)
         all_elements.append(PageBreak())
 

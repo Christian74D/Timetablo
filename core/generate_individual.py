@@ -1,33 +1,32 @@
 import random
-from constants import HOURS, SECTIONS, DAYS, data, section_data
+from core.constants import HOURS, DAYS
 
-def generate_gene():
+def generate_gene(data, section_data):
+    SECTIONS = len(section_data)
     # Initialize the gene and free_slots
     gene = {
         sec: [[None for _ in range(HOURS)] for _ in range(DAYS)]
-        for sec in section_data["section"]
+        for sec in section_data
     }
 
     free_slots = {
         sec: {(day, hour) for day in range(DAYS) for hour in range(HOURS)}
-        for sec in section_data["section"]
+        for sec in section_data
     }
-
+   
+    
     for item in data:
         if item["block"] is not None:  
             for period in item["block"]:
                 day, hour = period
-                day -= 1
-                hour -= 1
-                # Check if the slot is available for all sections
-                if all((day, hour) in free_slots[sec] for sec in item["sections"]):
-                    for sec in item["sections"]:
-                        gene[sec][day][hour] = (item["id"], item["subjects"])
-                        free_slots[sec].remove((day, hour))
-                else:
-                    print(f"Clash detected for item {item['id']} at period {period}.")
-                    break  
-
+                for sec in item["sections"]:
+                    if gene[sec][day][hour]:
+                        print(f"Conflict in lab allocation for item {item['id']} on day {day} hour {hour}")
+                        print("Current gene:", gene[sec][day][hour])
+                        print("Replacing with:", (item["id"], item["subjects"]))
+                    gene[sec][day][hour] = (item["id"], item["subjects"])
+                    free_slots[sec].remove((day, hour))
+               
             item["period"] = item["block"]
 
         else:

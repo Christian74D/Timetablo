@@ -1,12 +1,8 @@
 import pandas as pd
 import pickle
-import os
 
-def process_timetable_data(input_file, output_pkl='timetable_data.pkl'):
-    base = os.path.dirname(os.path.abspath(__file__))
-
-    input_file_path = os.path.join(base, input_file)
-    df = pd.read_excel(input_file_path)
+def format_timetable_data(input_file, output_pkl='timetable_data.pkl'):
+    df = pd.read_excel(input_file)
 
     data = []
     for _, row in df.iterrows():
@@ -32,14 +28,11 @@ def process_timetable_data(input_file, output_pkl='timetable_data.pkl'):
             'block': block
         }
         data.append(record)
+    #mulitsec lab first, then single sec lab, then theory
+    data.sort(key=lambda x: (not bool(x.get("block")), not (len(x.get("sections", [])) > 1 and x.get("lab", 0) > 0), x.get("lab", 0) <= 0, len(x.get("sections", [])) <= 1))
+    data_lookup = {item['id']: item for item in data}
 
-    output_pkl_path = os.path.join(base, output_pkl)
-    with open(output_pkl_path, 'wb') as f:
-        pickle.dump(data, f)
-
-    return data
-
-# Example usage
-if __name__ == '__main__':
-    data = process_timetable_data('sastra_data.xlsx')
-    print("Data processed and saved to 'timetable_data.pkl'")
+    with open(output_pkl, 'wb') as f:
+        pickle.dump((data, data_lookup), f)
+    print(data)
+    print(f"Processed timetable data saved to {output_pkl}")
