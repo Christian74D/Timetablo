@@ -9,8 +9,9 @@ data_dir = os.path.join(base_dir, "..", "data")
 DAYS = 5
 HOURS = 8
 
+lunch_color = colors.green
 multisec_color = colors.violet
-blocked_color = colors.lightgreen
+blocked_color = colors.grey
 
 data_path = 'data/timetable_data.pkl'
 

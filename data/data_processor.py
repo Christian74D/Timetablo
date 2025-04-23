@@ -11,5 +11,5 @@ def process_data(op_path):
     generate_lunches('data/split_data.xlsx', 'data/section_codes.xlsx', 'data/data_with_lunch.xlsx')
     format_timetable_data('data/data_with_lunch.xlsx', 'data/timetable_data_without_labs.pkl')
     lab_allocator('data/timetable_data_without_labs.pkl', op_path, 'data/section_codes.xlsx')
-    encoded_df, section_map, subject_map, staff_map = encoded_data('data/data.xlsx', 'data/encoded_data.xlsx', 'data/section_codes.xlsx', 'data/staff_codes.xlsx', 'data/subject_codes.xlsx')
+    encoded_df, section_map, subject_map, staff_map = encoded_data('data/data_lunch_lab_allocated.xlsx', 'data/encoded_data.xlsx', 'data/section_codes.xlsx', 'data/staff_codes.xlsx', 'data/subject_codes.xlsx')
     return encoded_df, section_map, subject_map, staff_map

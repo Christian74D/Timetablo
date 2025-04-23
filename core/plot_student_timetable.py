@@ -3,7 +3,7 @@ from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, KeepTogether, PageBreak
 from core.generate_individual import generate_gene
-from core.constants import DAYS, HOURS, blocked_color, multisec_color
+from core.constants import DAYS, HOURS, blocked_color, multisec_color, lunch_color
 from tqdm import tqdm
 
 
@@ -15,6 +15,7 @@ def create_section_tables(gene, section_name, styles, normal_style, data, data_l
     header_row = [""] + [f"Period {i+1}" for i in range(HOURS)]
     table_data.append(header_row)
 
+    lunch_cells = []
     blocked_cells = []
     multisec_cells = []
 
@@ -26,10 +27,13 @@ def create_section_tables(gene, section_name, styles, normal_style, data, data_l
                 subject_code = ",\n".join(entry[1]) if isinstance(entry[1], list) else entry[1]
                 text = f"{subject_code} ({entry[0]})"
                 cell_content = Paragraph(text, normal_style)
-                if data_lookup[entry[0]]["block"]:
-                    blocked_cells.append((day, hour))
+                if "nan" in data_lookup[entry[0]]["staffs"]:
+                    lunch_cells.append((day, hour))
                 elif len(data_lookup[entry[0]]["sections"]) > 1:
                     multisec_cells.append((day, hour))
+                elif data_lookup[entry[0]]["block"]:
+                    blocked_cells.append((day, hour))
+                
             else:
                 cell_content = ""
             row.append(cell_content)
@@ -50,12 +54,16 @@ def create_section_tables(gene, section_name, styles, normal_style, data, data_l
         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
     ]
 
+    for day, hour in lunch_cells:
+        timetable_style.append(('BACKGROUND', (hour+1, day+1), (hour+1, day+1), lunch_color))
+
     for day, hour in blocked_cells:
         timetable_style.append(('BACKGROUND', (hour+1, day+1), (hour+1, day+1), blocked_color))
 
     for day, hour in multisec_cells:
         timetable_style.append(('BACKGROUND', (hour+1, day+1), (hour+1, day+1), multisec_color))
 
+    
     timetable_table.setStyle(TableStyle(timetable_style))
 
     staff_table_data = []

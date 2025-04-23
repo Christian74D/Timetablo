@@ -39,7 +39,8 @@ def allocate_labs(gene, data, section_data):
                     for hour in cfg:
                         #print(f"Allocated lab {cfg} for item {item['id']} on day {day}")
                         gene[sec][day][hour] = (item["id"], item["subjects"])
-                        free_slots[sec].remove((day, hour))
+                        free_slots[sec] = {slot for slot in free_slots[sec] if slot[0] != day} #remove all lab slots from that day (one lab per day)
+
                 item["block"] = [(day, hour) for hour in cfg]  
                 
                 success = True
@@ -85,7 +86,15 @@ def lab_allocator(input_path, output_path, section_path):
     with open(output_path, 'wb') as f:
         pickle.dump((data, data_lookup), f)
 
+    data.sort(key=lambda x: (not bool(x.get("block")), not (len(x.get("sections", [])) > 1 and x.get("lab", 0) > 0), x.get("lab", 0) <= 0, len(x.get("sections", [])) <= 1))
     df = pd.DataFrame(data)
+    # Convert list columns to comma-separated strings
+    
+    for col in df.columns:
+        if df[col].apply(lambda x: isinstance(x, list)).any():
+            df[col] = df[col].apply(lambda x: ', '.join(map(str, x)) if isinstance(x, list) else x)
+
+    # Now export to Excel
     df.to_excel("data/data_lunch_lab_allocated.xlsx", index=False)
 
     print(f"Lab allocation complete. Saved to: {output_path}")

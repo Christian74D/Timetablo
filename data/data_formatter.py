@@ -29,10 +29,9 @@ def format_timetable_data(input_file, output_pkl='timetable_data.pkl'):
         }
         data.append(record)
     #mulitsec lab first, then single sec lab, then theory
-    data.sort(key=lambda x: (not bool(x.get("block")), not (len(x.get("sections", [])) > 1 and x.get("lab", 0) > 0), x.get("lab", 0) <= 0, len(x.get("sections", [])) <= 1))
+    #data.sort(key=lambda x: (not bool(x.get("block")), not (len(x.get("sections", [])) > 1 and x.get("lab", 0) > 0), x.get("lab", 0) <= 0, len(x.get("sections", [])) <= 1))
     data_lookup = {item['id']: item for item in data}
 
     with open(output_pkl, 'wb') as f:
         pickle.dump((data, data_lookup), f)
-    print(data)
     print(f"Processed timetable data saved to {output_pkl}")

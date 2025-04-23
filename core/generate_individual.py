@@ -16,7 +16,7 @@ def generate_gene(data, section_data):
    
     
     for item in data:
-        if item["block"] is not None:  
+        if item["block"] is not None:
             for period in item["block"]:
                 day, hour = period
                 for sec in item["sections"]:
@@ -29,20 +29,45 @@ def generate_gene(data, section_data):
                
             item["period"] = item["block"]
 
-        else:
-            theory, lab = item["theory"], item["lab"] 
-            # Theory
-            for _ in range(theory):
-                for _ in range(100):
-                    day = random.randint(0, DAYS - 1)
-                    hour = random.randint(0, HOURS - 1)
-                    if all((day, hour) in free_slots[sec] for sec in item["sections"]):
-                        for sec in item["sections"]:
-                            gene[sec][day][hour] = (item["id"], item["subjects"])
-                            free_slots[sec].remove((day, hour))
-                        item["period"] = (day, hour)
-                        break
-                else:
-                    print("Assignment failed:", item, f"\nremaining assignments: theory {theory} lab {lab}")
-                
+    for item in data:
+        if item["block"] is None:
+            theory, lab = item["theory"], item["lab"]
+            sections = item["sections"]
+
+            # Build a map of available hours per day (intersection across all sections)
+            free_slots_per_day = {
+                day: [
+                    hour for hour in range(HOURS)
+                    if all((day, hour) in free_slots[sec] for sec in sections)
+                ]
+                for day in range(DAYS)
+            }
+
+            # Get all days that have at least one common free slot across sections
+            valid_days = [day for day, hours in free_slots_per_day.items() if hours]
+            
+            if len(valid_days) < theory:
+                print("Not enough valid days for assignment:", item)
+                continue
+
+            # Randomly select distinct days equal to the theory hours needed
+            chosen_days = random.sample(valid_days, theory)
+
+            assigned_periods = []
+
+            for day in chosen_days:
+                available_hours = free_slots_per_day[day]
+                if not available_hours:
+                    print(f"No available hour on day {day} for item {item}")
+                    continue
+
+                hour = random.choice(available_hours)
+                for sec in sections:
+                    gene[sec][day][hour] = (item["id"], item["subjects"])
+                    free_slots[sec].remove((day, hour))
+
+                assigned_periods.append((day, hour))
+
+            item["period"] = assigned_periods
+            
     return gene
