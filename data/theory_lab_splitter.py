@@ -37,4 +37,4 @@ def theory_lab_split(src_path, dest_path):
     df = load_data(src_path)
     split_df = split_theory_lab(df)
     save_to_excel(split_df, dest_path)
-    print("Split theory and lab rows.")
+    #print("Split theory and lab rows.")

@@ -51,7 +51,7 @@ def allocate_labs(gene, data, section_data):
 
     return gene
 
-def lab_allocator(input_path, output_path, section_path):
+def lab_allocator(input_path, section_path):
     section_data = load_sections(section_path)    
     with open(input_path, 'rb') as f:
         data = pickle.load(f)
@@ -80,8 +80,7 @@ def lab_allocator(input_path, output_path, section_path):
     gene = allocate_labs(gene, data, section_data)
 
     # Save updated data
-    with open(output_path, 'wb') as f:
-        pickle.dump((data), f)
+    
 
     df = pd.DataFrame(data)
     # Convert list columns to comma-separated strings
@@ -93,5 +92,7 @@ def lab_allocator(input_path, output_path, section_path):
     # Now export to Excel
     df.to_excel("data/data_lunch_lab_allocated.xlsx", index=False)
 
-    print(f"Lab allocation complete. Saved to: {output_path}")
-    print(f"Data saved to: data/data_lunch_lab_allocated.xlsx")
+    #print(f"Lab allocation complete. Saved to: {output_path}")
+    #print(f"Data saved to: data/data_lunch_lab_allocated.xlsx")
+
+    return data

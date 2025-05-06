@@ -79,5 +79,5 @@ def generate_lunches(src_path, section_path,  dest_path):
     lunch_allocations = allocate_lunches(sections, days, lunch_hours)
     lunch_rows = create_lunch_rows(lunch_allocations, sections, days, lunch_hours)
     save_combined_data(df, lunch_rows, dest_path)
-    print(f"Generated lunch data and saved to {dest_path}")
+    #print(f"Generated lunch data and saved to {dest_path}")
 
