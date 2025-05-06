@@ -90,5 +90,5 @@ def generate_gene(data, section_data, heuristic=False):
             return data, gene
 
     #print(f"❌ Individual generation failed after {allocation_attempts} attempts")
-    raise ImpossibleAllocationError("Allocation failed after {allocation_attempts} attempts.")
+    raise ImpossibleAllocationError(f"Allocation failed after {allocation_attempts} attempts.")
     return None

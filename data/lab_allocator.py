@@ -1,7 +1,7 @@
 import pickle
 import random
 import pandas as pd
-from core.constants import DAYS, HOURS, allowed_lab_configs
+from core.constants import DAYS, HOURS, allowed_lab_configs, data_path
 
 def load_sections(file_path):
     section_df = pd.read_excel(file_path)
@@ -94,5 +94,8 @@ def lab_allocator(input_path, section_path):
 
     #print(f"Lab allocation complete. Saved to: {output_path}")
     #print(f"Data saved to: data/data_lunch_lab_allocated.xlsx")
+
+    with open(data_path, 'wb') as f:
+        pickle.dump((data), f)
 
     return data
