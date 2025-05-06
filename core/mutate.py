@@ -1,7 +1,9 @@
 import random
+from copy import deepcopy
 from core.constants import MUTATION_RATE, HOURS, DAYS
 
 def mutate_gene(data, gene):
+    gene = deepcopy(gene)  # Create a deep copy of the gene structure
     for item in data:
         if item.get("block") is not None or item["theory"] == 0 or random.random() > MUTATION_RATE:
             continue
@@ -54,4 +56,4 @@ def mutate_gene(data, gene):
             new_periods.append((day, hour))
         item["period"] = new_periods
     
-    return data, gene
+    return gene

@@ -87,7 +87,7 @@ def generate_gene(data, section_data, heuristic=False):
             data[:] = data_attempt
             if heuristic:
                 return attempt
-            return data, gene
+            return gene
 
     #print(f"❌ Individual generation failed after {allocation_attempts} attempts")
     raise ImpossibleAllocationError(f"Allocation failed after {allocation_attempts} attempts.")
