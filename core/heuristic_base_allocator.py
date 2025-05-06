@@ -35,3 +35,7 @@ def generate_heuristic_allocation():
 
     random.seed(best_seed)
     return process_data()
+
+if __name__ == "__main__":
+    with open("data/heuristic_allocation.pkl", "wb") as f:
+        pickle.dump(generate_heuristic_allocation(), f)

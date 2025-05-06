@@ -10,9 +10,8 @@ HOURS = 8
 MUTATION_RATE = 0.3
 
 allocation_attempts = 100
-allocation_restarts = 10
-heuristic_trials = 5
-heuristic_samples = 5
+heuristic_trials = 10
+heuristic_samples = 20
 
 lunch_color = colors.green
 multisec_color = colors.violet
