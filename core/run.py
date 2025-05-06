@@ -17,15 +17,13 @@ from core.time import calculate_time, save_time_to_file
 from core.constants import data_path
 from core.plot_student_timetable import plot_timetables_for_all_sections
 from core.generate_individual import generate_gene
-from data.data_processor import process_data
+from core.heuristic_base_allocator import generate_heuristic_allocation
 from core.mutate import mutate_gene
 
 def main():
-    encoded_df, section_map, subject_map, staff_map = process_data(data_path)
-    data = pickle.load(open(data_path, 'rb'))
+    data, encoded_df, section_map, subject_map, staff_map = generate_heuristic_allocation()
     
     d_data, gene = generate_gene(data, section_map)
-    
     plot_timetables_for_all_sections(gene, section_map, data, "tt.pdf")
     data2, m_gene = mutate_gene(d_data, gene)
     plot_timetables_for_all_sections(m_gene, section_map, data2, "tt_mutated.pdf")

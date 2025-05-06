@@ -58,9 +58,9 @@ def encoded_data(src_path, dest_path, section_path, staff_path, subject_path):
     encoded_df = merge_data(df, section_map, subject_map, staff_map)
     encoded_df.to_excel(dest_path, index=False)
 
-    print(f"Encoded data saved to {dest_path}")
-    print(f"Section codes saved to {section_path}")
-    print(f"Staff codes saved to {staff_path}")
-    print(f"Subject codes saved to {subject_path}")
+    #print(f"Encoded data saved to {dest_path}")
+    #print(f"Section codes saved to {section_path}")
+    #print(f"Staff codes saved to {staff_path}")
+    #print(f"Subject codes saved to {subject_path}")
 
     return encoded_df, section_map, subject_map, staff_map

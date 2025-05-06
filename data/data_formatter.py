@@ -33,4 +33,4 @@ def format_timetable_data(input_file, output_pkl='timetable_data.pkl'):
 
     with open(output_pkl, 'wb') as f:
         pickle.dump((data), f)
-    print(f"Processed timetable data saved to {output_pkl}")
+    #print(f"Processed timetable data saved to {output_pkl}")

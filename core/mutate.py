@@ -35,7 +35,7 @@ def mutate_gene(data, gene):
 
         # Filter out only days with at least one free hour
         valid_days = [d for d in free_slots_per_day if free_slots_per_day[d]]
-        print(used_days, valid_days)
+        #print(used_days, valid_days)
         #if len(valid_days) < len(current_periods):
         #    # Reassign original periods if mutation fails
         #    for day, hour in current_periods:
