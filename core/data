@@ -1,7 +1,0 @@
-import pandas as pd
-
-section_data = pd.read_excel("data/section_codes.xlsx")
-staff_data = pd.read_excel("data/staff_codes.xlsx")
-subject_data = pd.read_excel("data/subject_codes.xlsx")
-
-SECTIONS = len(section_data["section"].unique())

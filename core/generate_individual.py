@@ -1,73 +1,92 @@
 import random
-from core.constants import HOURS, DAYS
+from copy import deepcopy
+from core.constants import HOURS, DAYS, allocation_attempts, allocation_restarts
 
 def generate_gene(data, section_data):
-    SECTIONS = len(section_data)
-    # Initialize the gene and free_slots
-    gene = {
-        sec: [[None for _ in range(HOURS)] for _ in range(DAYS)]
-        for sec in section_data
-    }
+    def initialize_with_blocks(data_copy):
+        gene = {
+            sec: [[None for _ in range(HOURS)] for _ in range(DAYS)]
+            for sec in section_data
+        }
 
-    free_slots = {
-        sec: {(day, hour) for day in range(DAYS) for hour in range(HOURS)}
-        for sec in section_data
-    }
-   
-    
-    for item in data:
-        if item["block"] is not None:
-            for period in item["block"]:
-                day, hour = period
-                for sec in item["sections"]:
-                    if gene[sec][day][hour]:
-                        print(f"Conflict in lab allocation for item {item['id']} on day {day} hour {hour}")
-                        print("Current gene:", gene[sec][day][hour])
-                        print("Replacing with:", (item["id"], item["subjects"]))
-                    gene[sec][day][hour] = (item["id"], item["subjects"])
-                    free_slots[sec].remove((day, hour))
-               
-            item["period"] = item["block"]
+        free_slots = {
+            sec: {(day, hour) for day in range(DAYS) for hour in range(HOURS)}
+            for sec in section_data
+        }
 
-    for item in data:
-        if item["block"] is None:
-            theory, lab = item["theory"], item["lab"]
-            sections = item["sections"]
+        for item in data_copy:
+            if item["block"] is not None:
+                for day, hour in item["block"]:
+                    for sec in item["sections"]:
+                        gene[sec][day][hour] = (item["id"], item["subjects"])
+                        free_slots[sec].remove((day, hour))
+                item["period"] = item["block"]
 
-            # Build a map of available hours per day (intersection across all sections)
-            free_slots_per_day = {
-                day: [
-                    hour for hour in range(HOURS)
-                    if all((day, hour) in free_slots[sec] for sec in sections)
-                ]
-                for day in range(DAYS)
-            }
+        return gene, free_slots
 
-            # Get all days that have at least one common free slot across sections
-            valid_days = [day for day, hours in free_slots_per_day.items() if hours]
-            
-            if len(valid_days) < theory:
-                print("Not enough valid days for assignment:", item)
-                continue
+    prefilled_data = deepcopy(data)
+    prefilled_gene, prefilled_slots = initialize_with_blocks(deepcopy(prefilled_data))
 
-            # Randomly select distinct days equal to the theory hours needed
-            chosen_days = random.sample(valid_days, theory)
+    for restart in range(allocation_restarts):
+        for attempt in range(1, allocation_attempts + 1):
+            data_attempt = deepcopy(prefilled_data)
+            gene = deepcopy(prefilled_gene)
+            free_slots = deepcopy(prefilled_slots)
+            success = True
 
-            assigned_periods = []
+            for item in data_attempt:
+                if item["block"] is None:
+                    theory = item["theory"]
+                    sections = item["sections"]
 
-            for day in chosen_days:
-                available_hours = free_slots_per_day[day]
-                if not available_hours:
-                    print(f"No available hour on day {day} for item {item}")
-                    continue
+                    free_slots_per_day = {
+                        day: [
+                            hour for hour in range(HOURS)
+                            if all((day, hour) in free_slots[sec] for sec in sections)
+                        ]
+                        for day in range(DAYS)
+                    }
 
-                hour = random.choice(available_hours)
-                for sec in sections:
-                    gene[sec][day][hour] = (item["id"], item["subjects"])
-                    free_slots[sec].remove((day, hour))
+                    valid_days = [day for day, hours in free_slots_per_day.items() if hours]
 
-                assigned_periods.append((day, hour))
+                    if len(valid_days) < theory:
+                        success = False
+                        break
 
-            item["period"] = assigned_periods
-            
-    return gene
+                    try:
+                        chosen_days = random.sample(valid_days, theory)
+                    except ValueError:
+                        success = False
+                        break
+
+                    assigned_periods = []
+
+                    for day in chosen_days:
+                        available_hours = free_slots_per_day[day]
+                        if not available_hours:
+                            success = False
+                            break
+
+                        hour = random.choice(available_hours)
+
+                        if all((day, hour) in free_slots[sec] for sec in sections):
+                            for sec in sections:
+                                gene[sec][day][hour] = (item["id"], item["subjects"])
+                                free_slots[sec].remove((day, hour))
+                            assigned_periods.append((day, hour))
+                        else:
+                            success = False
+                            break
+
+                    if not success:
+                        break
+
+                    item["period"] = assigned_periods
+
+            if success:
+                print(f"✅ Full Lab allocation succeeded with {restart} restarts on attempt {attempt}")
+                data[:] = data_attempt
+                return data, gene
+
+    print(f"❌ Allocation failed after {allocation_restarts} restarts with {allocation_attempts} attempts each")
+    return None

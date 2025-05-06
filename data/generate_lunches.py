@@ -29,17 +29,25 @@ def allocate_lunches(sections, days, lunch_hours):
         random.shuffle(available_sections)
 
         for section in available_sections:
-            # Shuffle to distribute fairly and randomly
             shuffled_hours = lunch_hours[:]
             random.shuffle(shuffled_hours)
 
+            assigned = False
             for hour in shuffled_hours:
                 if (section_hour_counts[section][hour] < ceil(days / num_hours) and
                         day_hour_counts[hour] < ideal_per_hour):
                     lunch_allocations[section][day] = hour
                     section_hour_counts[section][hour] += 1
                     day_hour_counts[hour] += 1
+                    assigned = True
                     break
+
+            if not assigned:
+                # Fallback: assign the least used hour
+                hour = min(lunch_hours, key=lambda h: day_hour_counts[h])
+                lunch_allocations[section][day] = hour
+                section_hour_counts[section][hour] += 1
+                day_hour_counts[hour] += 1
 
     return lunch_allocations
 

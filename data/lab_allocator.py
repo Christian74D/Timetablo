@@ -54,7 +54,7 @@ def allocate_labs(gene, data, section_data):
 def lab_allocator(input_path, output_path, section_path):
     section_data = load_sections(section_path)    
     with open(input_path, 'rb') as f:
-        data, data_lookup = pickle.load(f)
+        data = pickle.load(f)
 
     # Initialize gene structure
     gene = {
@@ -79,14 +79,10 @@ def lab_allocator(input_path, output_path, section_path):
     # Run lab allocation
     gene = allocate_labs(gene, data, section_data)
 
-    # Refresh data_lookup in case it's used elsewhere
-    data_lookup = {item["id"]: item for item in data}
-
     # Save updated data
     with open(output_path, 'wb') as f:
-        pickle.dump((data, data_lookup), f)
+        pickle.dump((data), f)
 
-    data.sort(key=lambda x: (not bool(x.get("block")), not (len(x.get("sections", [])) > 1 and x.get("lab", 0) > 0), x.get("lab", 0) <= 0, len(x.get("sections", [])) <= 1))
     df = pd.DataFrame(data)
     # Convert list columns to comma-separated strings
     

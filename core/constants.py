@@ -8,6 +8,10 @@ data_dir = os.path.join(base_dir, "..", "data")
 
 DAYS = 5
 HOURS = 8
+MUTATION_RATE = 0.3
+
+allocation_attempts = 10
+allocation_restarts = 100
 
 lunch_color = colors.green
 multisec_color = colors.violet
