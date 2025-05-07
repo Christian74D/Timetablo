@@ -85,16 +85,21 @@ def crossover_graph_based(parent1, parent2):
 
         weights = [group_graph.edges[current, n].get("weight", 1) for n in neighbors]
         total = sum(weights)
-        probs = [w / total for w in weights]
 
-        # Choose next nodes probabilistically based on edge weights
-        next_nodes = choices(neighbors, weights=probs, k=1)  # Adjust k as needed
+        if total == 0:
+            # Fall back to uniform random choice if all weights are zero
+            next_nodes = [random.choice(neighbors)]
+        else:
+            probs = [w / total for w in weights]
+            next_nodes = choices(neighbors, weights=probs, k=1)  # Adjust k if needed
+
         queue.extend(next_nodes)
+
 
     # Build children based on selected groups
     child1, child2 = {}, {}
     assigned = set()
-    print("Selected groups:", selected)
+    #print("Selected groups:", selected)
 
     for group in subject_groups:
         label = format_group_label(group)

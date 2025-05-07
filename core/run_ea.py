@@ -22,7 +22,29 @@ from core.mutate import mutate_gene
 from core.fitness_calculator import fitness
 from core.crossover_functions import crossover_random, crossover_biological, crossover_graph_based
 
-def main():
+
+import time
+import numpy as np
+from core.EA import EA  # Your EA class
+
+def run_ea(fixed_params, tuning_param, tuning_value, run_idx, max_generations, runs_per_setting):
+    start_time = time.time()
+    fitness_sums = np.zeros(max_generations)
+
+    ea = EA(**fixed_params, **{tuning_param: tuning_value})
+    _, _, fitness_history = ea.run()
+
+    fitness_sums[:len(fitness_history)] += fitness_history
+    elapsed = time.time() - start_time
+
+    return [
+        (run_idx, tuning_value, gen, fitns, elapsed)
+        for gen, fitns in enumerate(fitness_history)
+    ], fitness_sums, elapsed
+
+
+
+"""
     with open("data/heuristic_allocation.pkl", "rb") as f:
         data, encoded_df, section_map, subject_map, staff_map = pickle.load(f)
     
@@ -41,16 +63,5 @@ def main():
     child1, child2 = crossover_graph_based(gene1, gene2)
     plot_timetables_for_all_sections(child1, section_map, data, "tt_child1.pdf")
     plot_timetables_for_all_sections(child2, section_map, data, "tt_child2.pdf")
-
-if __name__ == "__main__":
-    start = time.time()
-    main()
-    end = time.time()
-    time_str = calculate_time(start, end)
-    save_time_to_file(time_str)
-
-
-
-
-
+"""
 

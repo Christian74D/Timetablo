@@ -64,11 +64,11 @@ def create_staff_table(staff_name, staff_tt, styles, normal_style):
 
     return elements
 
-def plot_timetables_for_all_staff():
+def plot_timetables_for_all_staff(filename="staff_timetables.pdf"):
     gene = generate_gene()
     staff_tt_map = build_staff_timetable_map(gene)
 
-    filename = "staff_timetables.pdf"
+    filename = "generated_timetables/" + filename
     document = SimpleDocTemplate(
         filename,
         pagesize=landscape(letter),

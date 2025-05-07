@@ -7,7 +7,6 @@ base_dir = os.path.dirname(__file__)
 data_dir = os.path.join(base_dir, "..", "data")
 DAYS = 5
 HOURS = 8
-MUTATION_RATE = 0.3
 
 allocation_attempts = 100
 heuristic_trials = 10
