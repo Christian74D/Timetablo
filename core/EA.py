@@ -30,6 +30,7 @@ with open("data/heuristic_allocation.pkl", "rb") as f:
 
 class EA:
     def __init__(self, population_size, max_generations, elitism_ratio, k=3, mutation_rate=0.3, replacement_ratio=0.0, crossover = "random", mr_tuning = False):
+        #print(mutation_rate, mr_tuning)
         self.population_size = population_size
         self.max_generations = max_generations
         self.elitism_size = int(elitism_ratio * population_size)
@@ -68,6 +69,7 @@ class EA:
     def next_gen(self):
         if self.mr_tuning:
             self.mutation_rate = self.mr_tuning[len(self.best_list)]
+        #print(f"Generation: {self.generation}, Mutation Rate: {self.mutation_rate}")
         self.calc_fitness()
 
         sorted_indices = sorted(range(self.population_size), key=lambda i: self.population_fitness[i])

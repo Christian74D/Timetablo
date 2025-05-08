@@ -11,7 +11,7 @@ def track_progress(future_to_run):
     while completed < total:
         completed = sum(f.done() for f in future_to_run)
         print(f"Progress: {(completed / total) * 100:.2f}% - {completed}/{total} completed.", end='\r')
-        time.sleep(1)
+        time.sleep(.2)
 
 def compute_average(fitness_sums, runs):
     return fitness_sums / runs

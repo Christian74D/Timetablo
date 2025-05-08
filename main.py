@@ -46,12 +46,14 @@ def main():
 
             for future in as_completed(futures):
                 raw_data, fitness_sums, elapsed = future.result()
-                run_idx, tuning_value = futures[future]
+                print(raw_data)
+                tuning_value, run_idx = futures[future]
                 results.extend(raw_data)
                 time_records.append([run_idx, tuning_value, elapsed])
                 avg_fitness = compute_average(fitness_sums, runs_per_setting)
                 for gen, avg_fit in enumerate(avg_fitness):
                     results.append([run_idx, tuning_value, gen, avg_fit, elapsed])
+                print("Results:", results)
     else:
         for tuning_value in tqdm(tuning_values, desc="Tuning Progress"):
             for run_idx in tqdm(range(runs_per_setting), leave=False):
@@ -74,4 +76,5 @@ if __name__ == "__main__":
     main()
     end = time.time()
     time_str = calculate_time(start, end)
+    print(time_str)
     save_time_to_file(time_str)

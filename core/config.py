@@ -1,12 +1,12 @@
 from core.crossover_functions import crossover_random, crossover_biological, crossover_graph_based
 
-use_multithreading = False
+use_multithreading = True
 max_generations = 40
-runs_per_setting = 1
+runs_per_setting = 8
 mr = 0.06
 
-tuning_param = "crossover"
-tuning_values = ["graph_based"]
+tuning_param = "mutation_rate"
+tuning_values = [0.01, 0.02, 0.03]
 
 #mr tuning
 tuning_dict = {
@@ -18,9 +18,9 @@ fixed_params = {
     "max_generations": max_generations,
     "population_size": 100,
     "mutation_rate": mr,
-    "k": 30,
+    "k": 3,
     "elitism_ratio": 0.1,
-    "crossover": crossover_random,
+    "crossover": crossover_graph_based,
     "replacement_ratio": 0.1,
-    "mr_tuning": "const"
+    "mr_tuning": "None"
 }
