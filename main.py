@@ -46,14 +46,14 @@ def main():
 
             for future in as_completed(futures):
                 raw_data, fitness_sums, elapsed = future.result()
-                print(raw_data)
+                #print(raw_data)
                 tuning_value, run_idx = futures[future]
                 results.extend(raw_data)
                 time_records.append([run_idx, tuning_value, elapsed])
                 avg_fitness = compute_average(fitness_sums, runs_per_setting)
                 for gen, avg_fit in enumerate(avg_fitness):
                     results.append([run_idx, tuning_value, gen, avg_fit, elapsed])
-                print("Results:", results)
+                #print("Results:", results)
     else:
         for tuning_value in tqdm(tuning_values, desc="Tuning Progress"):
             for run_idx in tqdm(range(runs_per_setting), leave=False):
@@ -67,7 +67,7 @@ def main():
     df = pd.DataFrame(results, columns=["Run", tuning_param, "Generation", "Fitness", "Time (s)"])
     df.to_csv(f"outputs/fitness_results_{tuning_param}.csv", index=False)
     print(f"Saved all results to fitness_results_{tuning_param}.csv")
-
+    print(f"Fitness plotted and saved to fitness_{tuning_param}.png")
     plot_fitness(df, tuning_param)
     save_summary(df, time_records, tuning_param)
 

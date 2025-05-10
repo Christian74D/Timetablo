@@ -2,16 +2,16 @@ from core.crossover_functions import crossover_random, crossover_biological, cro
 
 use_multithreading = True
 max_generations = 40
-runs_per_setting = 8
-mr = 0.06
+runs_per_setting = 1
+mr = 0.02
 
 tuning_param = "mutation_rate"
-tuning_values = [0.01, 0.02, 0.03]
+tuning_values = [.02, .04, .06, .08, .1, .2, .4, .8, 1.0]
 
 #mr tuning
 tuning_dict = {
     "const": [mr] * max_generations,
-    "fuzzy_tuned_cyclic": [0.06 * (1 + 0.5 * (-1) ** i) for i in range(max_generations)],
+    "cyclic": [mr*.9, mr, mr*1.1] * (max_generations // 2)
 }
 
 fixed_params = {

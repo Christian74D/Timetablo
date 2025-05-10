@@ -69,7 +69,7 @@ class EA:
     def next_gen(self):
         if self.mr_tuning:
             self.mutation_rate = self.mr_tuning[len(self.best_list)]
-        #print(f"Generation: {self.generation}, Mutation Rate: {self.mutation_rate}")
+        #print(f"\nGeneration: {self.generation}, Mutation Rate: {self.mutation_rate}")
         self.calc_fitness()
 
         sorted_indices = sorted(range(self.population_size), key=lambda i: self.population_fitness[i])
