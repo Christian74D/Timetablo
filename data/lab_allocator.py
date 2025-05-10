@@ -2,54 +2,84 @@ import pickle
 import random
 import pandas as pd
 from core.constants import DAYS, HOURS, allowed_lab_configs, data_path
+from copy import deepcopy
 
 def load_sections(file_path):
     section_df = pd.read_excel(file_path)
     return section_df['section'].tolist()
 
 def allocate_labs(gene, data, section_data):
-    free_slots = {
-        sec: {(day, hour) for day in range(DAYS) for hour in range(HOURS)}
-        for sec in section_data
-    }
+    #print(data)
+    retries = 0
+    while True:
+        retries += 1
+        success = True
+        gene_copy = deepcopy(gene)
 
-    for sec in section_data:
-        for day in range(DAYS):
-            for hour in range(HOURS):
-                if gene[sec][day][hour] is not None:
-                    free_slots[sec].discard((day, hour))
+        free_slots = {
+            sec: {(day, hour) for day in range(DAYS) for hour in range(HOURS)}
+            for sec in section_data
+        }
 
-    for item in data:
-        lab_len = item["lab"]
-        if lab_len <= 0:
-            continue
+        # Precompute staff mapping
+        staff_by_id = {item["id"]: item["staffs"] for item in data}
+        all_staff_ids = {staff for staffs in staff_by_id.values() for staff in staffs}
+        free_slots_faculty = {
+            staff: {(day, hour) for day in range(DAYS) for hour in range(HOURS)}
+            for staff in all_staff_ids
+        }
 
-        configs = allowed_lab_configs.get(lab_len, [])
-        if not configs:
-            print(f"No allowed config for lab length {lab_len} in item {item['id']}")
-            continue
+        # Update free slots based on current gene
+        for sec in section_data:
+            for day in range(DAYS):
+                for hour in range(HOURS):
+                    cell = gene_copy[sec][day][hour]
+                    if cell is not None:
+                        free_slots[sec].discard((day, hour))
+                        subject_id = cell[0]
+                        for staff in staff_by_id[subject_id]:
+                            free_slots_faculty[staff].discard((day, hour))
 
-        possible_blocks = [(day, [c-1 for c in cfg]) for day in range(DAYS) for cfg in configs]
-        random.shuffle(possible_blocks)
+        for item in data:
+            lab_len = item["lab"]
+            if lab_len <= 0:
+                continue
 
-        success = False
-        for day, cfg in possible_blocks:
-            if all(all((day, hour) in free_slots[sec] for sec in item["sections"]) for hour in cfg):
-                for sec in item["sections"]:
-                    for hour in cfg:
-                        #print(f"Allocated lab {cfg} for item {item['id']} on day {day}")
-                        gene[sec][day][hour] = (item["id"], item["subjects"])
-                        free_slots[sec] = {slot for slot in free_slots[sec] if slot[0] != day} #remove all lab slots from that day (one lab per day)
+            configs = allowed_lab_configs.get(lab_len, [])
+            if not configs:
+                print(f"No allowed config for lab length {lab_len} in item {item['id']}")
+                continue
 
-                item["block"] = [(day, hour) for hour in cfg]  
-                
-                success = True
-                break
+            possible_blocks = [(day, [c - 1 for c in cfg]) for day in range(DAYS) for cfg in configs]
+            random.shuffle(possible_blocks)
 
-        if not success:
-            print(f"Failed to allocate lab for item {item['id']}")
+            item_success = False
+            for day, cfg in possible_blocks:
+                if all(all((day, hour) in free_slots[sec] for sec in item["sections"]) for hour in cfg) and \
+                   all(all((day, hour) in free_slots_faculty[staff] for staff in item["staffs"]) for hour in cfg):
 
-    return gene
+                    for sec in item["sections"]:
+                        for hour in cfg:
+                            gene_copy[sec][day][hour] = (item["id"], item["subjects"])
+                            free_slots[sec] = {slot for slot in free_slots[sec] if slot[0] != day}
+
+                    for staff in item["staffs"]:
+                        free_slots_faculty[staff].discard((day, hour))
+
+
+                    item["block"] = [(day, hour) for hour in cfg]
+                    item_success = True
+                    break
+
+            if not item_success:
+                success = False
+                #print(f"Failed to allocate item {item['id']} {item['staffs']}")
+                break  # retry whole allocation
+
+        if success:
+            print(f"Lab allocation succeeded after {retries} attempt(s)")
+            return gene_copy
+
 
 def lab_allocator(input_path, section_path):
     section_data = load_sections(section_path)    

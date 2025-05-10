@@ -1,17 +1,20 @@
 from core.crossover_functions import crossover_random, crossover_biological, crossover_graph_based
+import numpy as np
 
 use_multithreading = True
-max_generations = 40
-runs_per_setting = 1
+max_generations = 10
+runs_per_setting = 6
 mr = 0.02
 
-tuning_param = "mutation_rate"
-tuning_values = [.02, .04, .06, .08, .1, .2, .4, .8, 1.0]
+tuning_param = "mr_tuning"
+tuning_values = ["const"]
 
 #mr tuning
 tuning_dict = {
     "const": [mr] * max_generations,
-    "cyclic": [mr*.9, mr, mr*1.1] * (max_generations // 2)
+    "cyclic": np.linspace(0.015, 0.025, 5).tolist() * max_generations,
+    "linear": np.linspace(0.02, 1, max_generations).tolist(),
+
 }
 
 fixed_params = {

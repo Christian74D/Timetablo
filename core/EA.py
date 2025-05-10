@@ -103,7 +103,7 @@ class EA:
         while len(next_gen) < self.population_size:
             p1, p2 = random.sample(self.parents, 2)
             c1, c2 = self.crossover(p1, p2)
-            
+            #c1, c2 = p1, p2
             c1 = mutate_gene(data, c1, self.mutation_rate)
             c2 = mutate_gene(data, c2, self.mutation_rate)
 

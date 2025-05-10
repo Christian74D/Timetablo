@@ -26,13 +26,18 @@ from core.crossover_functions import crossover_random, crossover_biological, cro
 import time
 import numpy as np
 from core.EA import EA  # Your EA class
+from core.plot_student_timetable import plot_timetables_for_all_sections
 
 def run_ea(fixed_params, tuning_param, tuning_value, run_idx, max_generations, runs_per_setting):
     start_time = time.time()
     fitness_sums = np.zeros(max_generations)
 
     ea = EA(**fixed_params, **{tuning_param: tuning_value})
-    _, _, fitness_history = ea.run()
+    sol, fitness, fitness_history = ea.run() 
+
+    # Create a valid filename string
+    filename = f"timetable_fitness_{int(fitness)}_{tuning_param}_{tuning_value}_run_{run_idx}.pdf"
+    plot_timetables_for_all_sections(sol, filename)
 
     fitness_sums[:len(fitness_history)] += fitness_history
     elapsed = time.time() - start_time

@@ -27,6 +27,7 @@ def count_teacher_conflicts(gene, data_by_id):
 
             for staff, sec_list in staff_to_sections.items():
                 if len(sec_list) > 1:
+                    #print(f"Conflict detected for staff {staff} on day {day}, period {period}: {sec_list}")
                     conflicts += len(sec_list) - 1  # One is OK, rest are conflicts
             
             #print(f"Day {day}, Period {period}: Staff to Sections: {staff_to_sections}")

@@ -30,8 +30,18 @@ def mutate_gene(data, gene, mutation_rate):
         subject_id = item["id"]
         subject_staff = staff_by_id[subject_id]
         sections = item["sections"]
-        current_periods = item.get("period", [])
-        required_slots = len(current_periods)
+        current_periods = [
+            (day, hour)
+            for day in range(DAYS)
+            for hour in range(HOURS)
+            if all(
+                gene[sec][day][hour] is not None and gene[sec][day][hour][0] == subject_id
+                for sec in sections
+            )
+        ]
+
+        required_slots = item["theory"]
+      
 
         # Free current slots
         for (day, hour) in current_periods:
@@ -41,6 +51,7 @@ def mutate_gene(data, gene, mutation_rate):
         # Step 1: Try conflict-free allocation
         conflict_free_slots = get_conflict_free_slots(gene, sections, subject_id, subject_staff, staff_by_id)
         chosen_slots = [(day, hour) for day, hour in conflict_free_slots.items()]
+        chosen_slots = chosen_slots[:required_slots]
         used_days = set(conflict_free_slots.keys())
 
         if len(chosen_slots) < required_slots:
@@ -62,6 +73,7 @@ def mutate_gene(data, gene, mutation_rate):
                     if free_hours:
                         hour = random.choice(free_hours)
                         chosen_slots.append((day, hour))
+             
 
             else:
                 # Use original allocation for remaining needed days
@@ -71,6 +83,7 @@ def mutate_gene(data, gene, mutation_rate):
                 for d in remaining_days[:remaining]:
                     hour = next(h for (day, h) in current_periods if day == d)
                     chosen_slots.append((d, hour))
+             
 
         # Final assignment
         for (day, hour) in chosen_slots:

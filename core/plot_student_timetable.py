@@ -5,7 +5,9 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, 
 from core.generate_individual import generate_gene
 from core.constants import DAYS, HOURS, blocked_color, multisec_color, lunch_color
 from tqdm import tqdm
-
+import pickle
+with open("data/heuristic_allocation.pkl", "rb") as f:
+        data, encoded_df, section_data, subject_map, staff_map = pickle.load(f)
 
 def create_section_tables(gene, section_name, styles, normal_style, data, data_lookup):
     elements = []
@@ -101,7 +103,7 @@ def create_section_tables(gene, section_name, styles, normal_style, data, data_l
 
     return elements
 
-def plot_timetables_for_all_sections(gene, section_data, data, filename):
+def plot_timetables_for_all_sections(gene, filename):
     filename = "generated_timetables/" + filename
     data_lookup = {item["id"]: item for item in data}
     document = SimpleDocTemplate(filename, pagesize=landscape(letter), rightMargin=20, leftMargin=20, topMargin=20, bottomMargin=20, title="Timetablo")

@@ -28,6 +28,8 @@ from core.generate_individual import generate_gene
 from core.mutate import mutate_gene
 from core.fitness_calculator import fitness
 from core.crossover_functions import crossover_random, crossover_biological, crossover_graph_based
+with open("data/heuristic_allocation.pkl", "rb") as f:
+        data, encoded_df, section_data, subject_map, staff_map = pickle.load(f)
 
 
 results = []
@@ -35,6 +37,11 @@ time_records = []
 fixed_params.pop(tuning_param, None)
 
 def main():
+    #gene = generate_gene(data, section_data)
+    #print("Initial Gene:", gene)
+    #print(fitness(gene, data))
+    #plot_timetables_for_all_sections(gene, "sample.pdf")
+    #return None
     if use_multithreading:
         with ProcessPoolExecutor() as executor:
             futures = {
