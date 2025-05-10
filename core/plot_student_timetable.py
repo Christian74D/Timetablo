@@ -118,11 +118,11 @@ def plot_timetables_for_all_sections(gene, filename):
     )
 
     all_elements = []
-    for section_name in tqdm(section_data, desc="Generating timetables"):
+    for section_name in section_data:
         section_elements = create_section_tables(gene, section_name, styles, normal_style, data, data_lookup)
         all_elements.extend(section_elements)
         all_elements.append(PageBreak())
 
     document.build(all_elements)
-    print(f"✅ All section timetables saved to '{filename}'")
+    #print(f"✅ All section timetables saved to '{filename}'")
 

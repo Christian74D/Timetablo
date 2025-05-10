@@ -77,7 +77,7 @@ def allocate_labs(gene, data, section_data):
                 break  # retry whole allocation
 
         if success:
-            print(f"Lab allocation succeeded after {retries} attempt(s)")
+            #print(f"Lab allocation succeeded after {retries} attempt(s)")
             return gene_copy
 
 

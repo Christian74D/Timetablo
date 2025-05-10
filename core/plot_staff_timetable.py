@@ -2,10 +2,13 @@ from reportlab.lib.pagesizes import letter, landscape
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, KeepTogether, PageBreak
-from generate_individual import generate_gene
-from constants import DAYS, HOURS, section_data, data
+from core.constants import DAYS, HOURS
 from tqdm import tqdm
 from collections import defaultdict
+
+import pickle
+with open("data/heuristic_allocation.pkl", "rb") as f:
+        data, encoded_df, section_data, subject_map, staff_map = pickle.load(f)
 
 def build_staff_timetable_map(gene):
     # Map from staff_name -> [ [ [entry], ..., H ] for D ]
@@ -19,8 +22,10 @@ def build_staff_timetable_map(gene):
                     id_, subjects = entry
                     subject = subjects[0] if isinstance(subjects, list) else subjects
                     for item in data:
-                        if item["id"] == id_ and item["block"] is None:
+                        if item["id"] == id_:
                             for staff in item["staffs"]:
+                                if staff == "nan":
+                                    continue
                                 staff_tt_map[staff][day][hour] = (section, subject, id_)
                             break
     return staff_tt_map
@@ -64,11 +69,10 @@ def create_staff_table(staff_name, staff_tt, styles, normal_style):
 
     return elements
 
-def plot_timetables_for_all_staff(filename="staff_timetables.pdf"):
-    gene = generate_gene()
+def plot_timetables_for_all_staff(gene, filename="staff_timetables.pdf"):
     staff_tt_map = build_staff_timetable_map(gene)
 
-    filename = "generated_timetables/" + filename
+    filename = "generated_timetables/staff/" + filename
     document = SimpleDocTemplate(
         filename,
         pagesize=landscape(letter),
@@ -97,7 +101,7 @@ def plot_timetables_for_all_staff(filename="staff_timetables.pdf"):
         all_elements.append(PageBreak())
 
     document.build(all_elements)
-    print(f"✅ All staff timetables saved to '{filename}'")
+    #print(f"✅ All staff timetables saved to '{filename}'")
 
 if __name__ == "__main__":
     plot_timetables_for_all_staff()

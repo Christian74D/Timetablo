@@ -19,7 +19,7 @@ def get_conflict_free_slots(gene, sections, subject_id, subject_staff, staff_by_
                 break  # only one period per day
     return conflict_free_slots
 
-def mutate_gene(data, gene, mutation_rate):
+def mutate_gene_GCFSA(data, gene, mutation_rate): #Greedy Conflict-Free Slot Assignment (GCFSA)
     gene = deepcopy(gene)
     staff_by_id = {item["id"]: set(item["staffs"]) for item in data}
 
@@ -92,3 +92,47 @@ def mutate_gene(data, gene, mutation_rate):
         item["period"] = chosen_slots
 
     return gene
+
+
+def mutate_gene(data, gene, mutation_rate):
+    gene = deepcopy(gene)  # Create a deep copy of the gene structure
+    for item in data:
+        if item.get("block") is not None or item["theory"] == 0 or random.random() > mutation_rate:
+            continue
+
+        subject_id = item["id"]
+        sections = item["sections"]
+        current_periods = item.get("period", [])
+
+        # Gather all currently used days for this subject ID
+        used_days = {day for (day, _) in current_periods}
+
+        # Recollect current slots to free them temporarily
+        for (day, hour) in current_periods:
+            for sec in sections:
+                gene[sec][day][hour] = None
+
+        # Build a map of new available hours for each day across all sections
+        free_slots_per_day = {
+            day: [
+                hour for hour in range(HOURS)
+                if all(gene[sec][day][hour] is None for sec in sections)
+            ]
+            for day in range(DAYS)
+        }
+        
+        valid_days = [d for d in free_slots_per_day if free_slots_per_day[d]]
+
+        chosen_days = random.sample(valid_days, len(current_periods))
+        new_periods = []
+
+        for day in chosen_days:
+            hour = random.choice(free_slots_per_day[day])
+            for sec in sections:
+                gene[sec][day][hour] = (subject_id, item["subjects"])
+            new_periods.append((day, hour))
+        item["period"] = new_periods
+    
+    return gene
+
+

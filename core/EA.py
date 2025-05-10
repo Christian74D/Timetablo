@@ -22,14 +22,14 @@ from core.generate_individual import generate_gene
 from core.mutate import mutate_gene
 from core.fitness_calculator import fitness
 from core.crossover_functions import crossover_random, crossover_biological, crossover_graph_based
-
+from core.mutate import mutate_gene, mutate_gene_GCFSA
 
 from core.config import tuning_dict
 with open("data/heuristic_allocation.pkl", "rb") as f:
         data, encoded_df, section_map, subject_map, staff_map = pickle.load(f)
 
 class EA:
-    def __init__(self, population_size, max_generations, elitism_ratio, k=3, mutation_rate=0.3, replacement_ratio=0.0, crossover = "random", mr_tuning = False):
+    def __init__(self, population_size, max_generations, elitism_ratio, k=3, mutation_rate=0.3, replacement_ratio=0.0, crossover = "random", mr_tuning = False, mutation = "mutate_gene"):
         #print(mutation_rate, mr_tuning)
         self.population_size = population_size
         self.max_generations = max_generations
@@ -53,7 +53,11 @@ class EA:
             self.crossover = crossover_biological
         else:
             self.crossover = crossover_graph_based
-    
+
+        if mutation == "mutate_gene_GCFSA":
+            self.mutation = mutate_gene_GCFSA
+        else:
+            self.mutation = mutate_gene
         
 
     def calc_fitness(self):
@@ -104,8 +108,8 @@ class EA:
             p1, p2 = random.sample(self.parents, 2)
             c1, c2 = self.crossover(p1, p2)
             #c1, c2 = p1, p2
-            c1 = mutate_gene(data, c1, self.mutation_rate)
-            c2 = mutate_gene(data, c2, self.mutation_rate)
+            c1 = self.mutation(data, c1, self.mutation_rate)
+            c2 = self.mutation(data, c2, self.mutation_rate)
 
             total_mutations += 2
             successful += 1 if fitness(c1, data) < fitness(p1, data) else 0

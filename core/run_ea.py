@@ -27,6 +27,7 @@ import time
 import numpy as np
 from core.EA import EA  # Your EA class
 from core.plot_student_timetable import plot_timetables_for_all_sections
+from core.plot_staff_timetable import plot_timetables_for_all_staff
 
 def run_ea(fixed_params, tuning_param, tuning_value, run_idx, max_generations, runs_per_setting):
     start_time = time.time()
@@ -38,7 +39,7 @@ def run_ea(fixed_params, tuning_param, tuning_value, run_idx, max_generations, r
     # Create a valid filename string
     filename = f"timetable_fitness_{int(fitness)}_{tuning_param}_{tuning_value}_run_{run_idx}.pdf"
     plot_timetables_for_all_sections(sol, filename)
-
+    plot_timetables_for_all_staff(sol, filename)
     fitness_sums[:len(fitness_history)] += fitness_history
     elapsed = time.time() - start_time
 
