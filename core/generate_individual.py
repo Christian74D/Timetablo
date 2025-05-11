@@ -8,6 +8,8 @@ def generate_gene(data, section_data, heuristic=False):
             sec: [[None for _ in range(HOURS)] for _ in range(DAYS)]
             for sec in section_data
         }
+        #for i in data:
+        #    print(i)
 
         free_slots = {
             sec: {(day, hour) for day in range(DAYS) for hour in range(HOURS)}

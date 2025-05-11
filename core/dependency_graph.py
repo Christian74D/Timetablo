@@ -19,7 +19,7 @@ with open(data_file_path, 'rb') as f:
 with open(shared_group_path, 'rb') as f:
     shared_subject_groups = pickle.load(f)
 
-# Parse periods and row info
+# Updating data to include sections
 row_info = []
 periods_by_id = {}
 for row in data:
@@ -56,7 +56,7 @@ for (sec1, sec2), id_set in section_pair_ids.items():
     if weight > 0:
         G_sec.add_edge(sec1, sec2, weight=weight)
 
-# Save and plot section-wise graph
+# Saving graph data
 plt.figure(figsize=(10, 8), dpi=600)
 pos = nx.spring_layout(G_sec, seed=42)
 nx.draw(G_sec, pos, with_labels=True, node_color="lightgreen", node_size=2200, font_size=10)
@@ -69,11 +69,11 @@ with open(os.path.join(data_folder, 'dependency_graph.pkl'), 'wb') as f:
 
 print("Saved section-wise graph.")
 
-# GROUP-WISE GRAPH (Label nodes using section names)
+# GROUP-WISE GRAPH (clustered)
 def format_group_label(group):
     return ",".join(sorted(group))
 
-# Map sections to group labels
+# Labelling groups using section names
 group_labels = [format_group_label(group) for group in shared_subject_groups]
 section_to_group = {}
 for group in shared_subject_groups:
@@ -87,15 +87,15 @@ for label in group_labels:
 
 group_pair_weights = defaultdict(int)
 
-# Aggregate weights between groups
+# Aggregate weights
 for (sec1, sec2), id_set in section_pair_ids.items():
     g1, g2 = section_to_group[sec1], section_to_group[sec2]
     if g1 == g2:
-        continue  # skip internal edges
+        continue  
     key = tuple(sorted((g1, g2)))
     group_pair_weights[key] += sum(periods_by_id[rid] for rid in id_set)
 
-# Add edges to group graph with normalized weights
+# Normalize weights
 for (g1, g2), weight in group_pair_weights.items():
     size1 = len(g1.split(','))  # sections in group 1
     size2 = len(g2.split(','))  # sections in group 2
@@ -103,7 +103,7 @@ for (g1, g2), weight in group_pair_weights.items():
     G_grp.add_edge(g1, g2, weight=normalized_weight)
 
 
-# Save and plot group-wise graph
+# Plot
 plt.figure(figsize=(12, 9), dpi=600)
 pos = nx.spring_layout(G_grp, seed=42)
 nx.draw(G_grp, pos, with_labels=True, node_color="skyblue", node_size=3000, font_size=9)

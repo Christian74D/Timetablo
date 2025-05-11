@@ -1,13 +1,13 @@
 import numpy as np
 
-
+input_path = 'simulations/synthetic_data_20.xlsx'
 use_multithreading = True
-max_generations = 50
-runs_per_setting = 10
+max_generations = 10
+runs_per_setting = 2
 mr = 0.02
 
 tuning_param = "mutation_rate"
-tuning_values = [0.001, 0.01, 0.02, 0.03, 1.0]
+tuning_values = [0.005,0.01, 0.015, 0.02]
 
 #mr tuning
 tuning_dict = {

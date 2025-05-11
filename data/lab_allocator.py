@@ -73,7 +73,7 @@ def allocate_labs(gene, data, section_data):
 
             if not item_success:
                 success = False
-                #print(f"Failed to allocate item {item['id']} {item['staffs']}")
+                #print(f"Failed to allocate item {item['id']} {item['staffs']} {item['sections']} {item['lab']}")
                 break  # retry whole allocation
 
         if success:
