@@ -87,11 +87,11 @@ def crossover_graph_based(parent1, parent2):
         total = sum(weights)
 
         if total == 0:
-            # Fall back to uniform random choice if all weights are zero
+            # if all weights are zero, pick a random neighbor
             next_nodes = [random.choice(neighbors)]
         else:
             probs = [w / total for w in weights]
-            next_nodes = choices(neighbors, weights=probs, k=1)  # Adjust k if needed
+            next_nodes = choices(neighbors, weights=probs, k=1)  #Choosing one node
 
         queue.extend(next_nodes)
 

@@ -85,12 +85,12 @@ def generate_gene(data, section_data, heuristic=False):
                 item["period"] = assigned_periods
 
         if success:
-            #print(f"✅ Full Lab allocation succeeded on attempt {attempt}")
+            #print(f":) Full Lab allocation succeeded on attempt {attempt}")
             data[:] = data_attempt
             if heuristic:
                 return attempt
             return gene
 
-    #print(f"❌ Individual generation failed after {allocation_attempts} attempts")
+    #print(f":( Individual generation failed after {allocation_attempts} attempts")
     raise ImpossibleAllocationError(f"Allocation failed after {allocation_attempts} attempts.")
     return None

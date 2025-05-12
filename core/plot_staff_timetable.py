@@ -101,7 +101,7 @@ def plot_timetables_for_all_staff(gene, filename="staff_timetables.pdf"):
         all_elements.append(PageBreak())
 
     document.build(all_elements)
-    #print(f"✅ All staff timetables saved to '{filename}'")
+    #print(f"All staff timetables saved to '{filename}'")
 
 if __name__ == "__main__":
     plot_timetables_for_all_staff()

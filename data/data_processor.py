@@ -6,11 +6,19 @@ from data.enocode_data import encoded_data
 from core.config import input_path
 import pandas as pd
 
-def process_data():
-    theory_lab_split(input_path, 'data/split_data.xlsx')
-    encoded_data(input_path, 'data/encoded_data.xlsx', 'data/section_codes.xlsx', 'data/staff_codes.xlsx', 'data/subject_codes.xlsx')
-    generate_lunches('data/split_data.xlsx', 'data/section_codes.xlsx', 'data/data_with_lunch.xlsx')
-    format_timetable_data('data/data_with_lunch.xlsx', 'data/timetable_data_without_labs.pkl')
-    data = lab_allocator('data/timetable_data_without_labs.pkl', 'data/section_codes.xlsx')
-    encoded_df, section_map, subject_map, staff_map = encoded_data('data/data_lunch_lab_allocated.xlsx', 'data/encoded_data.xlsx', 'data/section_codes.xlsx', 'data/staff_codes.xlsx', 'data/subject_codes.xlsx')
+def process_data(seed=""):
+    base = "data/content/"
+    theory_lab_split(input_path, f'{base}split_data{seed}.xlsx')
+    encoded_data(input_path, f'{base}encoded_data{seed}.xlsx', f'{base}section_codes.xlsx', f'{base}staff_codes.xlsx', f'{base}subject_codes.xlsx')
+    generate_lunches(f'{base}split_data{seed}.xlsx', f'{base}section_codes.xlsx', f'{base}data_with_lunch{seed}.xlsx')
+    format_timetable_data(f'{base}data_with_lunch{seed}.xlsx', f'{base}timetable_data_without_labs{seed}.pkl')
+    data = lab_allocator(f'{base}timetable_data_without_labs{seed}.pkl', f'{base}section_codes.xlsx', f"{base}data_lunch_lab_allocated{seed}.xlsx")
+    encoded_df, section_map, subject_map, staff_map = encoded_data(
+        f'{base}data_lunch_lab_allocated{seed}.xlsx',
+        f'{base}encoded_data{seed}.xlsx',
+        f'{base}section_codes.xlsx',
+        f'{base}staff_codes.xlsx',
+        f'{base}subject_codes.xlsx'
+    )
     return data, encoded_df, section_map, subject_map, staff_map
+

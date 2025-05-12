@@ -16,10 +16,10 @@ def get_conflict_free_slots(gene, sections, subject_id, subject_staff, staff_by_
                     staff_in_hour |= staff_by_id[other_id]
             if subject_staff.isdisjoint(staff_in_hour):
                 conflict_free_slots[day] = hour
-                break  # only one period per day
+                break  # only one period per day per subject
     return conflict_free_slots
 
-def mutate_gene_GCFSA(data, gene, mutation_rate): #Greedy Conflict-Free Slot Assignment (GCFSA)
+def mutate_gene_GCFSA(data, gene, mutation_rate): # Greedy Conflict-Free Slot Assignment (GCFSA)
     gene = deepcopy(gene)
     staff_by_id = {item["id"]: set(item["staffs"]) for item in data}
 
@@ -43,12 +43,11 @@ def mutate_gene_GCFSA(data, gene, mutation_rate): #Greedy Conflict-Free Slot Ass
         required_slots = item["theory"]
       
 
-        # Free current slots
         for (day, hour) in current_periods:
             for sec in sections:
                 gene[sec][day][hour] = None
 
-        # Step 1: Try conflict-free allocation
+        # Trying conflict-free allocation
         conflict_free_slots = get_conflict_free_slots(gene, sections, subject_id, subject_staff, staff_by_id)
         chosen_slots = [(day, hour) for day, hour in conflict_free_slots.items()]
         chosen_slots = chosen_slots[:required_slots]
@@ -76,7 +75,7 @@ def mutate_gene_GCFSA(data, gene, mutation_rate): #Greedy Conflict-Free Slot Ass
              
 
             else:
-                # Use original allocation for remaining needed days
+                # Using original slots for remaining slots
                 remaining = required_slots - len(chosen_slots)
                 remaining_days = [d for (d, h) in current_periods if d not in used_days]
                 random.shuffle(remaining_days)
@@ -85,7 +84,7 @@ def mutate_gene_GCFSA(data, gene, mutation_rate): #Greedy Conflict-Free Slot Ass
                     chosen_slots.append((d, hour))
              
 
-        # Final assignment
+        # Update gene
         for (day, hour) in chosen_slots:
             for sec in sections:
                 gene[sec][day][hour] = (subject_id, item["subjects"])
@@ -95,7 +94,7 @@ def mutate_gene_GCFSA(data, gene, mutation_rate): #Greedy Conflict-Free Slot Ass
 
 
 def mutate_gene(data, gene, mutation_rate):
-    gene = deepcopy(gene)  # Create a deep copy of the gene structure
+    gene = deepcopy(gene)  
     for item in data:
         if item.get("block") is not None or item["theory"] == 0 or random.random() > mutation_rate:
             continue
@@ -104,15 +103,15 @@ def mutate_gene(data, gene, mutation_rate):
         sections = item["sections"]
         current_periods = item.get("period", [])
 
-        # Gather all currently used days for this subject ID
+        # Current days
         used_days = {day for (day, _) in current_periods}
 
-        # Recollect current slots to free them temporarily
+        # Free current slots
         for (day, hour) in current_periods:
             for sec in sections:
                 gene[sec][day][hour] = None
 
-        # Build a map of new available hours for each day across all sections
+        # Available slots
         free_slots_per_day = {
             day: [
                 hour for hour in range(HOURS)

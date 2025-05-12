@@ -7,7 +7,7 @@ NUM_SECTIONS = 20  # 👈 Scale this to adjust everything
      # 👈 Number of clusters for shared multi-section subject
 
 # === RANDOMIZED DERIVED CONSTANTS ===
-NUM_ENTRIES = int(NUM_SECTIONS * random.uniform(6, 8))
+NUM_ENTRIES = int(NUM_SECTIONS * random.uniform(2, 4))
 NUM_SUBJECTS = int(NUM_SECTIONS * random.uniform(2, 4))
 NUM_STAFF = int(NUM_SECTIONS * random.uniform(2, 4))
 LAB_RATIO = random.uniform(0.1, 0.2)

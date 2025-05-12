@@ -124,5 +124,5 @@ def plot_timetables_for_all_sections(gene, filename):
         all_elements.append(PageBreak())
 
     document.build(all_elements)
-    #print(f"✅ All section timetables saved to '{filename}'")
+    #print(f"All section timetables saved to '{filename}'")
 

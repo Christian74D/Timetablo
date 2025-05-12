@@ -81,7 +81,7 @@ def allocate_labs(gene, data, section_data):
             return gene_copy
 
 
-def lab_allocator(input_path, section_path):
+def lab_allocator(input_path, section_path, op_path):
     section_data = load_sections(section_path)    
     with open(input_path, 'rb') as f:
         data = pickle.load(f)
@@ -120,7 +120,7 @@ def lab_allocator(input_path, section_path):
             df[col] = df[col].apply(lambda x: ', '.join(map(str, x)) if isinstance(x, list) else x)
 
     # Now export to Excel
-    df.to_excel("data/data_lunch_lab_allocated.xlsx", index=False)
+    df.to_excel(op_path, index=False)
 
     #print(f"Lab allocation complete. Saved to: {output_path}")
     #print(f"Data saved to: data/data_lunch_lab_allocated.xlsx")

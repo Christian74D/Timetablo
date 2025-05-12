@@ -1,15 +1,21 @@
 from data.data_processor import process_data
 from core.generate_individual import generate_gene
 from core.constants import ImpossibleAllocationError, allocation_attempts, heuristic_trials, heuristic_samples
-
+from core.config import use_multithreading
 from copy import deepcopy
 import pickle
 import random
 from tqdm import tqdm
 
+
+import random
+from tqdm import tqdm
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+
 def score(seed):
     random.seed(seed)
-    data, encoded_df, section_map, subject_map, staff_map = process_data()
+    data, encoded_df, section_map, subject_map, staff_map = process_data(seed)
     score = 0
     for _ in range(heuristic_trials):
         data_copy = deepcopy(data)  
@@ -22,19 +28,35 @@ def score(seed):
     return score
 
 def generate_heuristic_allocation():
+    def evaluate_seed(seed):
+        random.seed(seed)
+        return seed, score(seed)
+
     min_score = float('inf')
     best_seed = 0
-    for seed in tqdm(range(heuristic_samples), desc="Finding best seed"):
-        random.seed(seed)
-        sscore = score(seed)
-        if sscore < min_score:
-            best_seed = seed
-            min_score = sscore
+
+    if use_multithreading:
+        with ThreadPoolExecutor() as executor:
+            futures = {executor.submit(evaluate_seed, seed): seed for seed in range(heuristic_samples)}
+            for future in tqdm(as_completed(futures), total=heuristic_samples, desc="Finding best seed"):
+                seed, sscore = future.result()
+                if sscore < min_score:
+                    best_seed = seed
+                    min_score = sscore
+    else:
+        for seed in tqdm(range(heuristic_samples), desc="Finding best seed"):
+            random.seed(seed)
+            sscore = score(seed)
+            if sscore < min_score:
+                best_seed = seed
+                min_score = sscore
+
     print(f"Best seed: {best_seed} with score: {score(best_seed)}")
     print("Heuristic Base Allocation Completed")
 
     random.seed(best_seed)
     return process_data()
+
 
 if __name__ == "__main__":
     with open("data/heuristic_allocation.pkl", "wb") as f:
