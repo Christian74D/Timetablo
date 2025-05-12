@@ -10,7 +10,7 @@ HOURS = 8
 
 allocation_attempts = 100
 heuristic_trials = 4
-heuristic_samples = 4
+heuristic_samples = 30
 
 lunch_color = colors.green
 multisec_color = colors.violet

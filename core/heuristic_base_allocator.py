@@ -1,7 +1,7 @@
 from data.data_processor import process_data
 from core.generate_individual import generate_gene
 from core.constants import ImpossibleAllocationError, allocation_attempts, heuristic_trials, heuristic_samples
-from core.config import use_multithreading
+from core.config import use_multithreading_setup
 from copy import deepcopy
 import pickle
 import random
@@ -35,7 +35,7 @@ def generate_heuristic_allocation():
     min_score = float('inf')
     best_seed = 0
 
-    if use_multithreading:
+    if use_multithreading_setup:
         with ThreadPoolExecutor() as executor:
             futures = {executor.submit(evaluate_seed, seed): seed for seed in range(heuristic_samples)}
             for future in tqdm(as_completed(futures), total=heuristic_samples, desc="Finding best seed"):

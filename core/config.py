@@ -1,9 +1,10 @@
 import numpy as np
 
-input_path = 'simulations/synthetic_data_20.xlsx'
-use_multithreading = True
-max_generations = 10
-runs_per_setting = 2
+input_path = 'data/data.xlsx' #'simulations/synthetic_data_20.xlsx'
+use_multithreading_setup = False
+use_multithreading_main = True
+max_generations = 50
+runs_per_setting = 4
 mr = 0.02
 
 tuning_param = "mutation_rate"

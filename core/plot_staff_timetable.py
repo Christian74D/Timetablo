@@ -95,7 +95,7 @@ def plot_timetables_for_all_staff(gene, filename="staff_timetables.pdf"):
     )
 
     all_elements = []
-    for staff_name in tqdm(sorted(staff_tt_map), desc="Generating staff timetables"):
+    for staff_name in sorted(staff_tt_map):
         staff_elements = create_staff_table(staff_name, staff_tt_map[staff_name], styles, normal_style)
         all_elements.extend(staff_elements)
         all_elements.append(PageBreak())

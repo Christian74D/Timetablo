@@ -104,7 +104,7 @@ def create_section_tables(gene, section_name, styles, normal_style, data, data_l
     return elements
 
 def plot_timetables_for_all_sections(gene, filename):
-    filename = "generated_timetables/" + filename
+    filename = "generated_timetables/student/" + filename
     data_lookup = {item["id"]: item for item in data}
     document = SimpleDocTemplate(filename, pagesize=landscape(letter), rightMargin=20, leftMargin=20, topMargin=20, bottomMargin=20, title="Timetablo")
     

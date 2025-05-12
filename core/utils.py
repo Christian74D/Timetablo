@@ -31,7 +31,7 @@ def plot_fitness(df, tuning_param):
     plt.title(f"Average Fitness Convergence for {tuning_param} Values")
     plt.legend(loc="lower right", fontsize=10)
     plt.grid(True)
-    plt.savefig(f"outputs\{tuning_param}_comparison.png")
+    plt.savefig(fr"outputs/{tuning_param}_comparison.png")
 
 def save_summary(df, time_records, tuning_param):
     df_time = pd.DataFrame(time_records, columns=["Run", tuning_param, "Time (s)"])
@@ -48,5 +48,5 @@ def save_summary(df, time_records, tuning_param):
         std_time=("Time (s)", "std"),
     ).reset_index()
 
-    summary.to_csv(f"outputs\{tuning_param}_summary_stats.csv", index=False)
+    summary.to_csv(fr"outputs/{tuning_param}_summary_stats.csv", index=False)
     print(f"Saved summary stats to {tuning_param}_summary_stats.csv")

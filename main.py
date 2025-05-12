@@ -42,7 +42,7 @@ def main():
     #print(fitness(gene, data))
     #plot_timetables_for_all_sections(gene, "sample.pdf")
     #return None
-    if use_multithreading:
+    if use_multithreading_main:
         with ProcessPoolExecutor() as executor:
             futures = {
                 executor.submit(run_ea, fixed_params, tuning_param, tuning_value, run_idx, max_generations, runs_per_setting): (tuning_value, run_idx)
