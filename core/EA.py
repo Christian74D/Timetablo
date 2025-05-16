@@ -86,7 +86,7 @@ class EA:
             self.best_fitness = new_best_fitness
             self.best_solution = self.population[best_idx]
 
-        self.best_list.append(self.best_fitness)
+        self.best_list.append(-self.best_fitness)
         self.fitness_changes.append(fitness_change)
 
         alpha = 0.5

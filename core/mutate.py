@@ -24,7 +24,7 @@ def mutate_gene_GCFSA(data, gene, mutation_rate): # Greedy Conflict-Free Slot As
     staff_by_id = {item["id"]: set(item["staffs"]) for item in data}
 
     for item in data:
-        if item.get("block") is not None or item["theory"] == 0:
+        if (item.get("block") is not None or item["theory"] == 0):
             continue
 
         subject_id = item["id"]
@@ -58,30 +58,23 @@ def mutate_gene_GCFSA(data, gene, mutation_rate): # Greedy Conflict-Free Slot As
             #print(f"id {subject_id} sections {sections} staff {subject_staff}")
 
             # Step 2: Fallback only if mutation is active
-            if random.random() < mutation_rate:
-                candidate_days = [d for d in range(DAYS) if d not in used_days]
-                random.shuffle(candidate_days)
-                i = 0
-                while len(chosen_slots) < required_slots and i < len(candidate_days):
-                    day = candidate_days[i]
-                    i += 1
-                    free_hours = [
-                        hour for hour in range(HOURS)
-                        if all(gene[sec][day][hour] is None for sec in sections)
-                    ]
-                    if free_hours:
-                        hour = random.choice(free_hours)
-                        chosen_slots.append((day, hour))
+        
+            candidate_days = [d for d in range(DAYS) if d not in used_days]
+            random.shuffle(candidate_days)
+            i = 0
+            while len(chosen_slots) < required_slots and i < len(candidate_days):
+                day = candidate_days[i]
+                i += 1
+                free_hours = [
+                    hour for hour in range(HOURS)
+                    if all(gene[sec][day][hour] is None for sec in sections)
+                ]
+                if free_hours:
+                    hour = random.choice(free_hours)
+                    chosen_slots.append((day, hour))
              
 
-            else:
-                # Using original slots for remaining slots
-                remaining = required_slots - len(chosen_slots)
-                remaining_days = [d for (d, h) in current_periods if d not in used_days]
-                random.shuffle(remaining_days)
-                for d in remaining_days[:remaining]:
-                    hour = next(h for (day, h) in current_periods if day == d)
-                    chosen_slots.append((d, hour))
+            
              
 
         # Update gene

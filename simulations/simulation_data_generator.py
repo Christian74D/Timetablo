@@ -3,23 +3,21 @@ import random
 import string
 
 # === MASTER CONTROL ===
-NUM_SECTIONS = 20  # 👈 Scale this to adjust everything
-     # 👈 Number of clusters for shared multi-section subject
-
-# === RANDOMIZED DERIVED CONSTANTS ===
-NUM_ENTRIES = int(NUM_SECTIONS * random.uniform(2, 4))
-NUM_SUBJECTS = int(NUM_SECTIONS * random.uniform(2, 4))
-NUM_STAFF = int(NUM_SECTIONS * random.uniform(2, 4))
-LAB_RATIO = random.uniform(0.1, 0.2)
+NUM_SECTIONS = 20  # 👈 Tune this to scale
+SUBJECTS_PER_SECTION = 7  # 5 theory + 2 lab
+MAX_SUBJECTS_PER_STAFF = 4
 BLOCKED_ENTRY_COUNT = max(1, int(NUM_SECTIONS / 10) + random.choice([0, 1]))
 BLOCKED_SECTIONS_PER_ENTRY = min(NUM_SECTIONS, random.randint(6, 12))
-K_CLUSTERS = NUM_SECTIONS // 3
 
-# === ENTRY COMPOSITION LIMITS ===
-SUBJ_COUNT_RANGE = (1, 2)
-STAFF_COUNT_RANGE = (1, 4)
+# Derived constants
+NUM_SUBJECTS = NUM_SECTIONS * SUBJECTS_PER_SECTION + 30
+NUM_STAFF = int(NUM_SECTIONS * 5.5)
 
-# === ANONYMIZED IDENTIFIERS ===
+# === RANGE LIMITS ===
+SUBJ_COUNT_RANGE = (1, 1)
+STAFF_COUNT_RANGE = (1, 1)
+
+# === HELPERS ===
 def excel_style_labels(n):
     labels = []
     i = 1
@@ -43,51 +41,95 @@ def generate_staff_list():
     return [f"Prof {label}" for label in excel_style_labels(NUM_STAFF)]
 
 # === ENTRY GENERATORS ===
-def generate_entries(section_pool, subject_pool, staff_pool):
+def generate_individual_entries(section_pool, subject_pool, staff_pool, staff_workload, used_subjects, start_id):
     entries = []
-    used_ids = 1
-    cluster_size = NUM_SECTIONS // K_CLUSTERS
-    shared_subjects = random.sample(subject_pool, K_CLUSTERS)
-    clusters = [section_pool[i * cluster_size:(i + 1) * cluster_size] for i in range(K_CLUSTERS)]
+    sid = start_id
+    for sec in section_pool:
+        # Pick 5 theory subjects
+        theory_subjects = random.sample([s for s in subject_pool if s not in used_subjects], 5)
+        for subj in theory_subjects:
+            used_subjects.add(subj)
+            eligible_staff = [s for s in staff_pool if staff_workload[s] < MAX_SUBJECTS_PER_STAFF]
+            if not eligible_staff:
+                raise ValueError("No eligible staff left for theory assignment.")
+            staff = random.choice(eligible_staff)
+            staff_workload[staff] += 1
+            entries.append({
+                "id": sid,
+                "sections": sec,
+                "subjects": subj,
+                "staffs": staff,
+                "theory": random.randint(3,4),
+                "lab": "",
+                "block": ""
+            })
+            sid += 1
 
-    # Generate one shared-subject multi-section entry per cluster
-    for idx, cluster_sections in enumerate(clusters):
-        subj = shared_subjects[idx]
-        staffs = random.sample(staff_pool, random.randint(*STAFF_COUNT_RANGE))
+        # Pick 2 lab subjects
+        lab_subjects = random.sample([s for s in subject_pool if s not in used_subjects], 2)
+        for subj in lab_subjects:
+            used_subjects.add(subj)
+            lab_staffs = random.sample([s for s in staff_pool if staff_workload[s] < MAX_SUBJECTS_PER_STAFF], 4)
+            for staff in lab_staffs:
+                staff_workload[staff] += 1
+            entries.append({
+                "id": sid,
+                "sections": sec,
+                "subjects": subj,
+                "staffs": ", ".join(lab_staffs),
+                "theory": "",
+                "lab": 2,
+                "block": ""
+            })
+            sid += 1
+    return entries, sid
+
+def generate_group_entries(section_pool, subject_pool, staff_pool, staff_workload, used_subjects, start_id):
+    entries = []
+    sid = start_id
+    available_sections = section_pool[:]
+    random.shuffle(available_sections)
+
+    while available_sections:
+        group_size = random.randint(1, max(1, NUM_SECTIONS // 4))
+        cluster = available_sections[:group_size]
+        available_sections = available_sections[group_size:]
+
+        subj = random.choice([s for s in subject_pool if s not in used_subjects])
+        used_subjects.add(subj)
+        staff_group = random.sample([s for s in staff_pool if staff_workload[s] < MAX_SUBJECTS_PER_STAFF], len(cluster))
+        for staff in staff_group:
+            staff_workload[staff] += 1
+
         entries.append({
-            "id": used_ids,
-            "sections": ", ".join(cluster_sections),
+            "id": sid,
+            "sections": ", ".join(cluster),
             "subjects": subj,
-            "staffs": ", ".join(staffs),
+            "staffs": ", ".join(staff_group),
             "theory": random.randint(2, 4),
             "lab": "",
             "block": ""
         })
-        used_ids += 1
+        sid += 1
 
-    # Fill remaining with mostly single-section entries
-    while used_ids <= NUM_ENTRIES:
-        is_lab = random.random() < LAB_RATIO
-        sec_count = 1  # Only 1 section unless it's in a cluster above
+        if random.choice([True, False]):  # also assign lab for group subject
+            subj_lab = random.choice([s for s in subject_pool if s not in used_subjects])
+            used_subjects.add(subj_lab)
+            lab_staffs = random.sample([s for s in staff_pool if staff_workload[s] < MAX_SUBJECTS_PER_STAFF], len(cluster))
+            for staff in lab_staffs:
+                staff_workload[staff] += 1
+            entries.append({
+                "id": sid,
+                "sections": ", ".join(cluster),
+                "subjects": subj_lab,
+                "staffs": ", ".join(lab_staffs),
+                "theory": "",
+                "lab": 2,
+                "block": ""
+            })
+            sid += 1
 
-        subj_count = random.randint(*SUBJ_COUNT_RANGE)
-        staff_count = random.randint(*STAFF_COUNT_RANGE)
-
-        sections = random.sample(section_pool, sec_count)
-        subjects = random.sample([s for s in subject_pool if s not in shared_subjects], subj_count)
-        staffs = random.sample(staff_pool, staff_count)
-
-        entries.append({
-            "id": used_ids,
-            "sections": ", ".join(sections),
-            "subjects": ", ".join(subjects),
-            "staffs": ", ".join(staffs),
-            "theory": random.randint(2, 4) if not is_lab else "",
-            "lab": 2 if is_lab else "",
-            "block": ""
-        })
-        used_ids += 1
-    return entries
+    return entries, sid
 
 def generate_blocked_entries(section_pool, start_id):
     blocked_entries = []
@@ -115,17 +157,26 @@ def generate_blocked_entries(section_pool, start_id):
         })
     return blocked_entries
 
-# === GENERATE & SAVE ===
+# === RUN GENERATOR ===
 section_pool = generate_section_codes()
 subject_pool = generate_subject_codes()
 staff_pool = generate_staff_list()
+staff_workload = {s: 0 for s in staff_pool}
+used_subjects = set()
 
-normal_entries = generate_entries(section_pool, subject_pool, staff_pool)
-blocked_entries = generate_blocked_entries(section_pool, NUM_ENTRIES + 1)
+next_id = 1
+individual_entries, next_id = generate_individual_entries(
+    section_pool, subject_pool, staff_pool, staff_workload, used_subjects, next_id)
 
-all_entries = normal_entries + blocked_entries
+group_entries, next_id = generate_group_entries(
+    section_pool, subject_pool, staff_pool, staff_workload, used_subjects, next_id)
+
+blocked_entries = generate_blocked_entries(section_pool, next_id)
+
+# === SAVE TO FILE ===
+all_entries = individual_entries + group_entries + blocked_entries
 df = pd.DataFrame(all_entries)
-
+print(df)
 filename = f"simulations/synthetic_data_{NUM_SECTIONS}.xlsx"
 df.to_excel(filename, index=False)
 print(f"✅ Anonymized data generated → Saved to '{filename}'")

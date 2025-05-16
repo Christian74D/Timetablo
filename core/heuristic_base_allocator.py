@@ -6,7 +6,7 @@ from copy import deepcopy
 import pickle
 import random
 from tqdm import tqdm
-
+from datetime import datetime
 
 import random
 from tqdm import tqdm
@@ -55,6 +55,10 @@ def generate_heuristic_allocation():
     print("Heuristic Base Allocation Completed")
 
     random.seed(best_seed)
+    with open("seeds.txt", "a") as f:
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        f.write(f"{timestamp} - Seed used: {best_seed}\n")
+
     return process_data()
 
 

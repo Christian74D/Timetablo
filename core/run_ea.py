@@ -40,7 +40,9 @@ def run_ea(fixed_params, tuning_param, tuning_value, run_idx, max_generations, r
     filename = f"timetable_fitness_{int(fitness)}_{tuning_param}_{tuning_value}_run_{run_idx}.pdf"
     plot_timetables_for_all_sections(sol, filename)
     plot_timetables_for_all_staff(sol, filename)
+    #print(fitness_history)
     fitness_sums[:len(fitness_history)] += fitness_history
+    #print(fitness_sums)
     elapsed = time.time() - start_time
 
     return [
