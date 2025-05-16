@@ -67,8 +67,14 @@ def save_summary(df, time_records, tuning_param):
                 first_gen_neg1 = gen
                 time_to_neg1 = round(time_per_gen * gen, 2)
 
-        zero_fitness_runs = (last_gen[last_gen[tuning_param] == param_value]["Fitness"] == 0).sum()
+        # Get all data for the current tuning param value
+        param_group = group[group[tuning_param] == param_value]
+
+        # Identify runs where **any generation** had fitness 0
+        runs_with_zero_fitness = param_group[param_group["Fitness"] == 0]["Run"].unique()
+        zero_fitness_runs = len(runs_with_zero_fitness)
         percent_zero_fitness = round((zero_fitness_runs / run_count) * 100, 2)
+
 
         # Aggregate stats
         last = last_gen[last_gen[tuning_param] == param_value]

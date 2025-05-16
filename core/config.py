@@ -3,10 +3,10 @@ import os
 
 actual_data = 'data/data.xlsx'
 sim_data = 'simulations/synthetic_data_20.xlsx'
-input_path = actual_data
+input_path = sim_data
 use_multithreading_setup = False
 use_multithreading_main = True
-max_generations = 100
+max_generations = 200
 runs_per_setting = 40
 mr = 0.01
 
@@ -40,7 +40,7 @@ tuning_dict = {
 
 fixed_params = {
     "max_generations": max_generations,
-    "mutation": "mutate_gene_GCFSA",
+    "mutation": "mutate_gen",
     "population_size": 100,
     "mutation_rate": mr,
     "k": 3,

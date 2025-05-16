@@ -3,15 +3,15 @@ import random
 import string
 
 # === MASTER CONTROL ===
-NUM_SECTIONS = 20  # 👈 Tune this to scale
+NUM_SECTIONS = 1  # 👈 Tune this to scale
 SUBJECTS_PER_SECTION = 7  # 5 theory + 2 lab
-MAX_SUBJECTS_PER_STAFF = 4
-BLOCKED_ENTRY_COUNT = max(1, int(NUM_SECTIONS / 10) + random.choice([0, 1]))
+MAX_SUBJECTS_PER_STAFF = 5
+BLOCKED_ENTRY_COUNT = 4
 BLOCKED_SECTIONS_PER_ENTRY = min(NUM_SECTIONS, random.randint(6, 12))
 
 # Derived constants
-NUM_SUBJECTS = NUM_SECTIONS * SUBJECTS_PER_SECTION + 30
-NUM_STAFF = int(NUM_SECTIONS * 5.5)
+NUM_SUBJECTS = 500 #for subject codes
+NUM_STAFF = int(NUM_SECTIONS * 3)
 
 # === RANGE LIMITS ===
 SUBJ_COUNT_RANGE = (1, 1)
@@ -140,7 +140,7 @@ def generate_blocked_entries(section_pool, start_id):
         sections = random.sample(section_pool, BLOCKED_SECTIONS_PER_ENTRY)
         block_slots = set()
 
-        while len(block_slots) < 4:
+        while len(block_slots) < 1:
             slot = (random.randint(1, 5), random.choice(allowed_hours))
             if slot not in used_slots:
                 used_slots.add(slot)
