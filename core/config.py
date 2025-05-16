@@ -2,8 +2,8 @@ import numpy as np
 import os
 
 actual_data = 'data/data.xlsx'
-sim_data = 'simulations/synthetic_data_20.xlsx'
-input_path = sim_data
+sim_data = 'simulations/synthetic_data_10.xlsx'
+input_path = actual_data
 use_multithreading_setup = False
 use_multithreading_main = True
 max_generations = 200
