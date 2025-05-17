@@ -44,12 +44,15 @@ def generate_heuristic_allocation():
                     best_seed = seed
                     min_score = sscore
     else:
+        scores = []
         for seed in tqdm(range(heuristic_samples), desc="Finding best seed"):
             random.seed(seed)
             sscore = score(seed)
+            scores.append(sscore)
             if sscore < min_score:
                 best_seed = seed
                 min_score = sscore
+
 
     print(f"Best seed: {best_seed} with score: {score(best_seed)}")
     print("Heuristic Base Allocation Completed")
@@ -57,7 +60,7 @@ def generate_heuristic_allocation():
     random.seed(best_seed)
     with open("seeds.txt", "a") as f:
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        f.write(f"{timestamp} - Seed used: {best_seed}\n")
+        f.write(f"{timestamp} - Seed used: {best_seed} - Score List - {scores}\n")
 
     return process_data()
 
