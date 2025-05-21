@@ -6,13 +6,13 @@ sim_data = 'simulations/synthetic_data_10.xlsx'
 input_path = actual_data
 use_multithreading_setup = False
 use_multithreading_main = True
-max_generations = 200
+max_generations = 10
 runs_per_setting = 40
 mr = 0.01
-gap_penalty = 0.1
+gap_penalty = 0.01
 
 tuning_param = "mutation"
-tuning_values = ["mutate_gene", "mutate_gene_GCFSA"]
+tuning_values = ["mutate_gene_GCFSA"]
 
 
 
